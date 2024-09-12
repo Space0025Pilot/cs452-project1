@@ -1,6 +1,6 @@
 # Makefile Project Template
 
-Steps to configure, build, run, and test the project.
+Steps to configure, build, run, and test the project. HIIIIIII!
 
 ## Building
 

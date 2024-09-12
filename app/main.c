@@ -22,7 +22,7 @@ int main (int argc, char **argv)
         printf("get c here");
         break;
       case '?':
-        if (isprint(optopt))
+        if (isprint (optopt))
           fprintf (stderr, "Unknown option", optopt);
         else
           fprintf (stderr, "Unknown option", optopt);
