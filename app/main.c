@@ -1,7 +1,14 @@
+/**File: main.c
+ * Author: Caitlyn Nelson
+ * Date: 9/16/2024
+ * Description: Main Code for Simple Shell
+ **/
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "lab.h"
 
 int main (int argc, char **argv)
 {
@@ -22,7 +29,7 @@ int main (int argc, char **argv)
         printf("get c here");
         break;
       case '?':
-        if (isprint (optopt))
+        if (isprint(optopt))
           fprintf (stderr, "Unknown option", optopt);
         else
           fprintf (stderr, "Unknown option", optopt);
