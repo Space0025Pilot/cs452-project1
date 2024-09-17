@@ -1,6 +1,12 @@
-// #include <string.h>
-// #include "harness/unity.h"
-// #include "../src/lab.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <sys/types.h>
+#include <termios.h>
+#include <unistd.h>
+#include <string.h>
+#include "harness/unity.h"
+#include "../src/lab.h"
 
 
 // void setUp(void) {
@@ -112,25 +118,25 @@
 //      free(line);
 // }
 
-// void test_get_prompt_default(void)
-// {
-//      char *prompt = get_prompt("MY_PROMPT");
-//      TEST_ASSERT_EQUAL_STRING(prompt, "shell>");
-//      free(prompt);
-// }
+void test_get_prompt_default(void)
+{
+     char *prompt = get_prompt("MY_PROMPT");
+     TEST_ASSERT_EQUAL_STRING(prompt, "shell>");
+     free(prompt);
+}
 
-// void test_get_prompt_custom(void)
-// {
-//      const char* prmpt = "MY_PROMPT";
-//      if(setenv(prmpt,"foo>",true)){
-//           TEST_FAIL();
-//      }
+void test_get_prompt_custom(void)
+{
+     const char* prmpt = "MY_PROMPT";
+     if(setenv(prmpt,"foo>",true)){
+          TEST_FAIL();
+     }
 
-//      char *prompt = get_prompt(prmpt);
-//      TEST_ASSERT_EQUAL_STRING(prompt, "foo>");
-//      free(prompt);
-//      unsetenv(prmpt);
-// }
+     char *prompt = get_prompt(prmpt);
+     TEST_ASSERT_EQUAL_STRING(prompt, "foo>");
+     free(prompt);
+     unsetenv(prmpt);
+}
 
 // void test_ch_dir_home(void)
 // {
@@ -169,15 +175,15 @@
 //   RUN_TEST(test_trim_white_both_whitespace_single);
 //   RUN_TEST(test_trim_white_both_whitespace_double);
 //   RUN_TEST(test_trim_white_all_whitespace);
-//   RUN_TEST(test_get_prompt_default);
+// RUN_TEST(test_get_prompt_default);
 //   RUN_TEST(test_get_prompt_custom);
 //   RUN_TEST(test_ch_dir_home);
 //   RUN_TEST(test_ch_dir_root);
 
 //   return UNITY_END();
 // }
-#include "harness/unity.h"
-#include "../src/lab.h"
+// #include "harness/unity.h"
+// #include "../src/lab.h"
 
 
 void setUp(void) {
@@ -194,6 +200,8 @@ void test_stuff(void){
 
 int main(void) {
   UNITY_BEGIN();
-  RUN_TEST(test_stuff);
+  // RUN_TEST(test_stuff);
+  RUN_TEST(test_get_prompt_default);
+  RUN_TEST(test_get_prompt_custom);
   return UNITY_END();
 }

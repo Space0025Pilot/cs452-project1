@@ -14,35 +14,38 @@
 #include "lab.h"
 #include "../tests/harness/unity.h"
 
+#define MAX_CHARACTER_LENGTH 10
+
 char *get_prompt(const char *env){
     if(getenv(env) != NULL){
-        printf("Inside not null");
-        setenv(env, "foo>", 1);
-        free(getenv(env));
-        return getenv(env);   //Note here that we need to free the resulting string from getenv as it calls malloc internally.
+        printf("Inside not null\n");
+        char * environmentvariable = (char *)malloc(sizeof(char) * MAX_CHARACTER_LENGTH);
+        environmentvariable = strcpy(environmentvariable, getenv(env));
+        return environmentvariable;
+        free(environmentvariable);
     }
     if (getenv(env) == NULL){
-        printf("Inside else");
-        setenv(env, "shell>", 1);
-        return getenv(env);
+        printf("Inside else\n");
+        char * promptarray = (char *)malloc(sizeof(char) * MAX_CHARACTER_LENGTH);
+        promptarray[0] = 's';
+        promptarray[1] = 'h';
+        promptarray[2] = 'e';
+        promptarray[3] = 'l';
+        promptarray[4] = 'l';
+        promptarray[5] = '>';
+        promptarray[6] = '\0';
+        return promptarray;
+        free(promptarray);
     }
-    
-    
 }
 
 void sh_init(struct shell *sh){
 
-    /* Allocate space for shell struct in heap and validate */
-    sh = (struct shell *)malloc(sizeof(struct shell));
-    // if(sh == NULL){
-    //     return NULL;
-    // }
-
     /* Initialize the sh with the initial values */
     sh->shell_is_interactive = 1;
-    sh->shell_pgid = 0;
+    sh->shell_pgid = 0;  //grab from the OS
     // struct termios *tm = malloc(sizeof(struct termios));   //Not sure this is a struct so do I allocate the memory for this.
-    // sh->shell_tmodes = expression;
+    sh->shell_tmodes.c_iflag = 1;
     sh->shell_terminal = 1;
     sh->prompt = "";
 }
@@ -50,9 +53,9 @@ void sh_init(struct shell *sh){
 void sh_destroy(struct shell *sh){
 
     /* Validate Parameter */
-    if(sh == NULL){
-        return;
-    }
+    // if(sh == NULL){
+    //     return;
+    // }
 
     // free(sh->shell_tmodes); //Again not sure how to do this
 

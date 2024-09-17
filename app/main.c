@@ -11,13 +11,15 @@
 #include <getopt.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-
 #include "../src/lab.h"
 
 int main(int argc, char **argv)
 {
 
   int opt;
+  char * prompt;
+  // struct shell *sh = (struct shell *)malloc(sizeof(struct shell));
+  // sh_init(sh);
 
   /* Use getopt() to process command line arguments */
   while ((opt = getopt(argc, argv, "pvczh")) != -1)
@@ -25,7 +27,10 @@ int main(int argc, char **argv)
     switch (opt)
     {
     case 'p':
-      printf("Get prompt variable: %s\n", get_prompt("MY_PROMPT"));
+      prompt = get_prompt("MY_PROMPT");
+      printf("Get prompt variable: %s\n", prompt);
+      free(prompt);
+      prompt = NULL; 
       break;
     case 'v':
       printf("Version -> %d.%d\n", lab_VERSION_MAJOR, lab_VERSION_MINOR);
@@ -62,6 +67,15 @@ int main(int argc, char **argv)
       abort();
     }
   }
+  // sh_destroy(sh);
+
+  // char *line;
+  // using_history();
+  // while ((line=readline("$"))){
+  //   printf("%s\n",line);
+  //   add_history(line);
+  //   free(line);
+// }
   return 0;
 }
 
