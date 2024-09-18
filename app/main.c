@@ -19,7 +19,10 @@ int main(int argc, char **argv)
   int opt;
   char * prompt;
   char *line;
-  char *linecheck = "";
+  char * home;
+  char **homepointer;
+  int err;
+  // char *linecheck = "";
   // struct shell *sh = (struct shell *)malloc(sizeof(struct shell));
   // sh_init(sh);
 
@@ -56,9 +59,35 @@ int main(int argc, char **argv)
   while ((line=readline("$"))){
     // printf("%s\n",line);
     add_history(line);
-    if((strcmp(line, "exit") == 0)|| (fgets(linecheck,BUFSIZ, stdin) == NULL)){
+    if((strcmp(line, "exit") == 0)|| ( line == NULL)){  //fgets(linecheck,BUFSIZ, stdin)
       free(line);
       exit(0);
+    }
+    if((strncmp(line, "cd", 2) == 0)){
+      printf("success\n");
+      //nothing entered -- users home directory
+      if(strcmp(line, "cd") == 0){
+        home = getenv("HOME");
+        printf("Getenv HOME: %s\n", home);
+        homepointer = &home;
+        if(home != NULL){
+          err = change_dir(homepointer);
+          printf("err: %d\n", err);
+          printf("Getenv HOME Second Call: %s\n", getenv("HOME"));
+          if(err == -1){
+            // free(err);
+            // free(homepointer);
+            // free(home);
+            exit(1);
+          }
+        }
+        // free(err);
+        // free(homepointer);
+        // free(home);
+      }
+
+
+      //something entered -- change to that directory if false folder, then error
     }
     free(line);
   }

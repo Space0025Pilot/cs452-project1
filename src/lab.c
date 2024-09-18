@@ -40,7 +40,11 @@ char *get_prompt(const char *env){
     }
 }
 
-// int change_dir(char **dir);
+int change_dir(char **dir){
+    int retvalue;
+    retvalue = chdir(*(dir));
+    return retvalue;
+}
 
 // char **cmd_parse(char const *line);
 
