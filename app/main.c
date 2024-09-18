@@ -13,16 +13,24 @@
 #include <readline/history.h>
 #include "../src/lab.h"
 
+static int exitcmd(int flag){
+  if(flag == 1){
+    exit(0);
+  }
+  exit(1);
+}
+
 int main(int argc, char **argv)
 {
 
   int opt;
   char * prompt;
+  int exitflag = 0;
   // struct shell *sh = (struct shell *)malloc(sizeof(struct shell));
   // sh_init(sh);
 
   /* Use getopt() to process command line arguments */
-  while ((opt = getopt(argc, argv, "pvczh")) != -1)
+  while ((opt = getopt(argc, argv, "pvczhe")) != -1)
   {
     switch (opt)
     {
@@ -49,6 +57,11 @@ int main(int argc, char **argv)
       fprintf(stdout, "        -z        Display ONLY proc entries in the zombie state\n");
       fprintf(stdout, "        -h        Display this help message\n");
       exit(0);
+    case 'e':
+      printf("Exiting...\n");
+      exitflag = 1;
+      exitcmd(exitflag);
+      break;
     // default:
     //     fprintf(stderr, "Error: Invalid Option Specified\n");
     //     // fprintf(stderr, "Usage: %s [-d <path>] \n", argv[0]);
@@ -71,11 +84,13 @@ int main(int argc, char **argv)
 
   // char *line;
   // using_history();
-  // while ((line=readline("$"))){
+  // while ((line=readline("$")) || exitflag != 1){
   //   printf("%s\n",line);
   //   add_history(line);
   //   free(line);
-// }
+  // }
+  // exitcmd(exitflag);
+
   return 0;
 }
 
