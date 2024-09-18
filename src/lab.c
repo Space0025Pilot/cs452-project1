@@ -18,14 +18,15 @@
 
 char *get_prompt(const char *env){
     if(getenv(env) != NULL){
-        printf("Inside not null\n");
+        // printf("Inside not null\n");
         char * environmentvariable = (char *)malloc(sizeof(char) * MAX_CHARACTER_LENGTH);
         environmentvariable = strcpy(environmentvariable, getenv(env));
         return environmentvariable;
         free(environmentvariable);
     }
-    if (getenv(env) == NULL){
-        printf("Inside else\n");
+    else{
+    // if (getenv(env) == NULL){
+        // printf("Inside else\n");
         char * promptarray = (char *)malloc(sizeof(char) * MAX_CHARACTER_LENGTH);
         promptarray[0] = 's';
         promptarray[1] = 'h';
@@ -38,6 +39,16 @@ char *get_prompt(const char *env){
         free(promptarray);
     }
 }
+
+// int change_dir(char **dir);
+
+// char **cmd_parse(char const *line);
+
+// void cmd_free(char ** line);
+
+// char *trim_white(char *line);
+
+// bool do_builtin(struct shell *sh, char **argv);
 
 void sh_init(struct shell *sh){
 
@@ -61,6 +72,8 @@ void sh_destroy(struct shell *sh){
 
     free(sh);
 }
+
+void parse_args(int argc, char **argv);
 
 
 
