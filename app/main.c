@@ -63,6 +63,7 @@ int main(int argc, char **argv)
       free(line);
       exit(0);
     }
+    //Read the entire line and delimit by whitespace
     if((strncmp(line, "cd", 2) == 0)){
       printf("success\n");
       //nothing entered -- users home directory
