@@ -203,5 +203,6 @@ int main(void) {
   // RUN_TEST(test_stuff);
   RUN_TEST(test_get_prompt_default);
   RUN_TEST(test_get_prompt_custom);
+  // RUN_TEST(test_cmd_parse);
   return UNITY_END();
 }

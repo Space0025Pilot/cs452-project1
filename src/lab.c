@@ -73,14 +73,18 @@ int change_dir(char **dir){
 }
 
 char **cmd_parse(char const *line){
-    /*Return pointer for the return value */
+    /*Return pointer for the return value and string */
     char ** returnPointer;
+    char * stringLine = "";
 
     /* Allocation and Instantiation of new array of arguments or argv */
     char * stringarray = (char *)malloc(sizeof(char) * _SC_ARG_MAX);
 
+    /* Copy the incoming line to another stringLine that is muttable */
+    stringLine = strcpy(stringLine, line);
+
     /* Tokenizing the arguments to put into the array */
-    char * partofstring = strtok(line, " ");
+    char * partofstring = strtok(stringLine, " ");
 
     /* Copy each piece of the tokenized array into our newly allocated array */
     int posCounter = 0;  //also argc
@@ -103,9 +107,12 @@ void cmd_free(char ** line){
 bool do_builtin(struct shell *sh, char **argv){
     
     /* If statements to take care of command line arguments */
-
+    bool returnvalue = false;
+    char const * arg0 = argv[0];
+    char const * arg1 = argv[1];
     /* Exit and Crtl-D Scenarios */ 
-    if((strcmp(*argv[0], "exit") == 0) || (*argv[0]) == NULL){
+    if((strcmp(arg0, "exit") == 0) || (arg0) == NULL){
+        returnvalue = true;
         free(*argv);
         free(**argv);
         free(sh);
@@ -113,9 +120,11 @@ bool do_builtin(struct shell *sh, char **argv){
     }
 
     /* Change directory */
-    if(strcmp(*argv[0], "cd") == 0){
-        change_dir(*argv[1]);
+    if(strcmp(arg0, "cd") == 0){
+        change_dir(argv[1]);
+        returnvalue = true;
     }
+    return returnvalue;
 }
 
 void sh_init(struct shell *sh){

@@ -20,10 +20,11 @@ int main(int argc, char **argv)
   int opt;
   char *line;
   char **linepointer;
-  char *linereturnpointer;
-  int err;
+  char **linereturnpointer;
+  // int err;
   struct shell *sh;
   bool handledOrNot;
+  char * prompt = "";
 
   /* Catch the aspect of printing the version */
   /* Use getopt() to process command line arguments */
@@ -53,7 +54,8 @@ int main(int argc, char **argv)
   sh_init(sh);
 
   /* Get prompt from the environment variable*/
-  sh->prompt = get_prompt("MY_PROMPT");
+  prompt = get_prompt("MY_PROMPT");
+  sh->prompt = prompt;
   // printf("Get prompt variable: %s\n", prompt);
 
   /* Start of readline and use of history */
@@ -63,11 +65,11 @@ int main(int argc, char **argv)
     add_history(line);
     
     /* Trim whitespace from line*/
-    line = trim_white(line);
+    // line = trim_white(line);
 
     /* Parse the command line */
     linereturnpointer = cmd_parse(line); //may have pointer issues here just BEWARE!
-    linepointer = &linereturnpointer;
+    linepointer = *(&linereturnpointer);
 
     /* Handle the arguments */
     handledOrNot = do_builtin(sh, linepointer);
