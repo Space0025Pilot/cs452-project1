@@ -11,10 +11,14 @@
 #include <termios.h>
 #include <unistd.h>
 #include <string.h>
+#include <pwd.h>
 #include "lab.h"
 #include "../tests/harness/unity.h"
 
 #define MAX_CHARACTER_LENGTH 10
+
+uid_t userid;
+struct passwd *pw; //pointer to the struct
 
 char *get_prompt(const char *env){
     if(getenv(env) != NULL){
@@ -41,12 +45,59 @@ char *get_prompt(const char *env){
 }
 
 int change_dir(char **dir){
+
     int retvalue;
+
+    /* If directory is null*/
+    if(*dir == NULL){
+        userid = getuid();
+        pw = getpwuid(userid);
+        if(pw == NULL){
+            perror("user is not valid (pwuid is NULL)");
+            return -1;
+        }
+        retvalue = chdir(pw->pw_dir);
+        if(retvalue == 0){
+            return retvalue;
+        }
+        else {
+            return retvalue;
+        }
+
+    }
+
+    /* If directory is not null*/
     retvalue = chdir(*(dir));
     return retvalue;
 }
 
-// char **cmd_parse(char const *line);
+char **cmd_parse(char const *line){
+
+    //If line is NULL, we exit as Crtl-D
+    if(line == NULL){
+        cmd_free(&line);
+        exit(0);
+    }
+    //allocation and instantiation of new array of arguments or argv
+    char * stringarray = (char *)malloc(sizeof(char) * _SC_ARG_MAX);
+
+    //Tokenizing the arguments to put into the array
+    char * partofstring = strtok(line, " ");
+
+    //Copy each piece of the tokenized array into our newly allocated array
+    int posCounter = 0;  //also argc
+    while(partofstring[posCounter] != NULL || posCounter < _SC_ARG_MAX){
+        stringarray[posCounter] = partofstring[posCounter];
+        posCounter++;
+        printf("Token %s\n", partofstring);
+    }
+
+    //If statements to take care of command line arguments 
+    if((strcmp(stringarray[0], "exit") == 0)){
+        cmd_free(&line);
+        exit(0);
+    }
+}
 
 // void cmd_free(char ** line);
 
