@@ -5,6 +5,7 @@
  **/
 
 #include <ctype.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -17,16 +18,12 @@ int main(int argc, char **argv)
 {
 
   int opt;
-  char * prompt;
   char *line;
-  char * home;
-  char **homepointer;
+  char **linepointer;
+  char *linereturnpointer;
   int err;
-  // char *linecheck = "";
-
-  /* Allocate the memory for the shell and initialize the shell */
-  // struct shell *sh = (struct shell *)malloc(sizeof(struct shell));
-  // sh_init(sh);
+  struct shell *sh;
+  bool handledOrNot;
 
   /* Catch the aspect of printing the version */
   /* Use getopt() to process command line arguments */
@@ -52,11 +49,12 @@ int main(int argc, char **argv)
     } 
   }
   
+  /* Initialize the shell */
+  sh_init(sh);
+
   /* Get prompt from the environment variable*/
-  prompt = get_prompt("MY_PROMPT");
+  sh->prompt = get_prompt("MY_PROMPT");
   // printf("Get prompt variable: %s\n", prompt);
-  free(prompt);
-  prompt = NULL;
 
   /* Start of readline and use of history */
   using_history();
@@ -68,19 +66,25 @@ int main(int argc, char **argv)
     line = trim_white(line);
 
     /* Parse the command line */
-    cmd_parse(line);
+    linereturnpointer = cmd_parse(line); //may have pointer issues here just BEWARE!
+    linepointer = &linereturnpointer;
 
     /* Handle the arguments */
-    do_builtin(sh, )
+    handledOrNot = do_builtin(sh, linepointer);
+    if(handledOrNot == false){
+      //error
+      cmd_free(linepointer);
+      free(line);
+      sh_destroy(sh);
+      exit(-1);
+    }
 
-
-    
   }
   /* Free the command line */
-  cmd_free(line);
+  cmd_free(linepointer);
 
   /* Free the allocated memory for the shell */
-  // sh_destroy(sh);
+  sh_destroy(sh);
   return 0;
 }
     

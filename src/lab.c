@@ -19,6 +19,8 @@
 
 uid_t userid;
 struct passwd *pw; //pointer to the struct
+char * home;
+char **homepointer;
 
 char *get_prompt(const char *env){
     if(getenv(env) != NULL){
@@ -48,7 +50,7 @@ int change_dir(char **dir){
 
     int retvalue;
 
-    /* If directory is null*/
+    /* If directory is null, get home director and change to it */
     if(*dir == NULL){
         userid = getuid();
         pw = getpwuid(userid);
@@ -63,68 +65,74 @@ int change_dir(char **dir){
         else {
             return retvalue;
         }
-
     }
 
-    /* If directory is not null*/
+    /* If directory is not null, then changes to specified directory */
     retvalue = chdir(*(dir));
     return retvalue;
 }
 
 char **cmd_parse(char const *line){
+    /*Return pointer for the return value */
+    char ** returnPointer;
 
-    //If line is NULL, we exit as Crtl-D
-    if(line == NULL){
-        cmd_free(&line);
-        exit(0);
-    }
-    //allocation and instantiation of new array of arguments or argv
+    /* Allocation and Instantiation of new array of arguments or argv */
     char * stringarray = (char *)malloc(sizeof(char) * _SC_ARG_MAX);
 
-    //Tokenizing the arguments to put into the array
+    /* Tokenizing the arguments to put into the array */
     char * partofstring = strtok(line, " ");
 
-    //Copy each piece of the tokenized array into our newly allocated array
+    /* Copy each piece of the tokenized array into our newly allocated array */
     int posCounter = 0;  //also argc
     while(partofstring[posCounter] != NULL || posCounter < _SC_ARG_MAX){
         stringarray[posCounter] = partofstring[posCounter];
         posCounter++;
-        printf("Token %s\n", partofstring);
+        // printf("Token %s\n", partofstring);
     }
-
-    //If statements to take care of command line arguments 
-    if((strcmp(stringarray[0], "exit") == 0)){
-        cmd_free(&line);
-        exit(0);
-    }
+    returnPointer = &stringarray;
+    return returnPointer;
 }
 
-// void cmd_free(char ** line);
+void cmd_free(char ** line){
+    free(*line);
+    line = NULL;
+}
 
 // char *trim_white(char *line);
 
-// bool do_builtin(struct shell *sh, char **argv);
+bool do_builtin(struct shell *sh, char **argv){
+    
+    /* If statements to take care of command line arguments */
+
+    /* Exit and Crtl-D Scenarios */ 
+    if((strcmp(*argv[0], "exit") == 0) || (*argv[0]) == NULL){
+        free(*argv);
+        free(**argv);
+        free(sh);
+        exit(0);
+    }
+
+    /* Change directory */
+    if(strcmp(*argv[0], "cd") == 0){
+        change_dir(*argv[1]);
+    }
+}
 
 void sh_init(struct shell *sh){
+
+    /* Allocate the space for the shell and initialize */
+    sh = (struct shell *)malloc(sizeof(struct shell));
 
     /* Initialize the sh with the initial values */
     sh->shell_is_interactive = 1;
     sh->shell_pgid = 0;  //grab from the OS
-    // struct termios *tm = malloc(sizeof(struct termios));   //Not sure this is a struct so do I allocate the memory for this.
-    sh->shell_tmodes.c_iflag = 1;
+    sh->shell_tmodes.c_iflag = 1; //Maybe set all flags to off
     sh->shell_terminal = 1;
     sh->prompt = "";
 }
 
 void sh_destroy(struct shell *sh){
-
-    /* Validate Parameter */
-    // if(sh == NULL){
-    //     return;
-    // }
-
-    // free(sh->shell_tmodes); //Again not sure how to do this
-
+    /* Destroy the shell struct */
     free(sh);
 }
 
