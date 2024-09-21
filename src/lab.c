@@ -24,7 +24,7 @@ char **homepointer;
 
 char *get_prompt(const char *env){
     if(getenv(env) != NULL){
-        // printf("Inside not null\n");
+        printf("Inside not null\n");
         char * environmentvariable = (char *)malloc(sizeof(char) * MAX_CHARACTER_LENGTH);
         environmentvariable = strcpy(environmentvariable, getenv(env));
         return environmentvariable;
@@ -32,7 +32,7 @@ char *get_prompt(const char *env){
     }
     else{
     // if (getenv(env) == NULL){
-        // printf("Inside else\n");
+        printf("Inside else\n");
         char * promptarray = (char *)malloc(sizeof(char) * MAX_CHARACTER_LENGTH);
         promptarray[0] = 's';
         promptarray[1] = 'h';
@@ -73,28 +73,65 @@ int change_dir(char **dir){
 }
 
 char **cmd_parse(char const *line){
-    /*Return pointer for the return value and string */
-    char ** returnPointer;
-    char * stringLine = "";
+    //Variables
+    char * copyOfLine;
+    char ** args = (char **)malloc(sizeof(char*) * _SC_ARG_MAX);
+    char * token;
+    int argCounter = 0;
 
-    /* Allocation and Instantiation of new array of arguments or argv */
-    char * stringarray = (char *)malloc(sizeof(char) * _SC_ARG_MAX);
-
-    /* Copy the incoming line to another stringLine that is muttable */
-    stringLine = strcpy(stringLine, line);
-
-    /* Tokenizing the arguments to put into the array */
-    char * partofstring = strtok(stringLine, " ");
-
-    /* Copy each piece of the tokenized array into our newly allocated array */
-    int posCounter = 0;  //also argc
-    while(partofstring[posCounter] != NULL || posCounter < _SC_ARG_MAX){
-        stringarray[posCounter] = partofstring[posCounter];
-        posCounter++;
-        // printf("Token %s\n", partofstring);
+    //Check that there is enough space to allocate the memory.
+    if(args == NULL){
+        perror("Couldn't allocate space");
+        exit(-1);
     }
-    returnPointer = &stringarray;
-    return returnPointer;
+
+    //Copy of Line
+    copyOfLine = strdup(line);
+
+    //Parse copyofLine for 1st command
+    token = strtok(copyOfLine, " ");
+    args[argCounter] = strdup(token);
+    
+    //Parse Arguments
+    token = strtok(NULL, " ");
+
+    while(token != NULL && argCounter < _SC_ARG_MAX - 1){
+        args[argCounter] = strdup(token);
+        argCounter++;
+        token = strtok(NULL, " ");
+    }
+
+    args[argCounter] = NULL;
+    
+    return args;
+
+
+
+    // /*Return pointer for the return value and string */
+    // char ** returnPointer;
+    // char * stringLine = "";
+
+    // /* Allocation and Instantiation of new array of arguments or argv */
+    // char * stringarray = (char *)malloc(sizeof(char) * _SC_ARG_MAX);
+
+    // /* Copy the incoming line to another stringLine that is muttable */
+    // stringLine = strdup(line);
+    // printf("stringline: %s\n", stringLine);
+
+    // /* Tokenizing the arguments to put into the array */
+    // char * partofstring = strtok(stringLine, " ");
+    // printf("partofstring %s\n", partofstring);
+
+    // /* Copy each piece of the tokenized array into our newly allocated array */
+    // int posCounter = 0;  //also argc
+    // while(partofstring[posCounter] != '\0' || posCounter < _SC_ARG_MAX){
+    //     stringarray[posCounter] = partofstring[posCounter];
+    //     posCounter++;
+    //     strtok(NULL, " ");
+    //     // printf("Token %s\n", partofstring);
+    // }
+    // returnPointer = &stringarray;
+    // return returnPointer;
 }
 
 void cmd_free(char ** line){
@@ -108,20 +145,27 @@ bool do_builtin(struct shell *sh, char **argv){
     
     /* If statements to take care of command line arguments */
     bool returnvalue = false;
+
     char const * arg0 = argv[0];
-    char const * arg1 = argv[1];
+    // char const * arg1 = argv[1];
+    char ** argv1pointer = &argv[1];
+
     /* Exit and Crtl-D Scenarios */ 
-    if((strcmp(arg0, "exit") == 0) || (arg0) == NULL){
+    if((strcmp(arg0, "exit") == 0) || (arg0 == NULL)){
         returnvalue = true;
-        free(*argv);
-        free(**argv);
+        if(argv != NULL){
+            for(int i = 0; argv[i] != NULL; i++){
+                free(argv[i]);
+            }
+        }
+        free(argv);
         free(sh);
         exit(0);
     }
 
     /* Change directory */
     if(strcmp(arg0, "cd") == 0){
-        change_dir(argv[1]);
+        change_dir(argv1pointer);
         returnvalue = true;
     }
     return returnvalue;
@@ -137,7 +181,7 @@ void sh_init(struct shell *sh){
     sh->shell_pgid = 0;  //grab from the OS
     sh->shell_tmodes.c_iflag = 1; //Maybe set all flags to off
     sh->shell_terminal = 1;
-    sh->prompt = "";
+    sh->prompt = NULL;
 }
 
 void sh_destroy(struct shell *sh){
