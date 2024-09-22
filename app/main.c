@@ -67,7 +67,7 @@ int main(int argc, char **argv)
     add_history(line);
     
     /* Trim whitespace from line*/
-    // line = trim_white(line);
+    line = trim_white(line);
 
     /* Parse the command line */
     linereturnpointer = cmd_parse(line); //may have pointer issues here just BEWARE!

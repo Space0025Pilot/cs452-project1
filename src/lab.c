@@ -11,6 +11,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <string.h>
+#include <ctype.h>
 #include <pwd.h>
 #include "lab.h"
 #include "../tests/harness/unity.h"
@@ -52,8 +53,14 @@ int change_dir(char **dir){
 
     int retvalue;
 
-    /* If directory is null, get home director and change to it */
-    if(*dir == NULL){
+    if(*dir == NULL && getenv("HOME") != NULL){
+        printf("Inside only cd command, home directory %s\n", getenv("HOME"));
+        retvalue = chdir(getenv("HOME"));
+        return retvalue;
+    }
+
+    /* If directory is null, get home directory and change to it */
+    if(*dir == NULL && getenv("HOME") == NULL){
         userid = getuid();
         pw = getpwuid(userid);
         if(pw == NULL){
@@ -126,7 +133,28 @@ void cmd_free(char ** line){
     line = NULL;
 }
 
-// char *trim_white(char *line);
+char *trim_white(char *line){
+
+    size_t i = 0;
+    size_t j = 0;
+
+    
+    // Remove leading spaces
+    for (i = 0; isspace(line[i]); i++);
+
+    // Shift all characters to the left
+    for (j = 0; line[i] != '\0'; i++, j++) {
+        line[j] = line[i];
+    }
+    line[j] = '\0';
+
+    // Remove trailing spaces
+    for (i = strlen(line) - 1; i >= 0 && isspace(line[i]); i--) {   //heap buffer overflow - handle only spaces case
+        line[i] = '\0';
+    }
+
+   return line;
+}
 
 bool do_builtin(struct shell *sh, char **argv){
     
@@ -151,7 +179,7 @@ bool do_builtin(struct shell *sh, char **argv){
     }
 
     /* Change directory */
-    if(strcmp(arg0, "cd") == 0){
+    if(strcmp(arg0, "cd") == 0 && argv[1] == NULL){
         change_dir(argv1pointer);
         returnvalue = true;
     }
