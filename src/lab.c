@@ -16,15 +16,17 @@
 #include "../tests/harness/unity.h"
 
 #define MAX_CHARACTER_LENGTH 10
+#define MAX_SIZE 4096
 
 uid_t userid;
 struct passwd *pw; //pointer to the struct
 char * home;
 char **homepointer;
+int argCounter = 0;
 
 char *get_prompt(const char *env){
     if(getenv(env) != NULL){
-        printf("Inside not null\n");
+        // printf("Inside not null\n");
         char * environmentvariable = (char *)malloc(sizeof(char) * MAX_CHARACTER_LENGTH);
         environmentvariable = strcpy(environmentvariable, getenv(env));
         return environmentvariable;
@@ -32,7 +34,7 @@ char *get_prompt(const char *env){
     }
     else{
     // if (getenv(env) == NULL){
-        printf("Inside else\n");
+        // printf("Inside else\n");
         char * promptarray = (char *)malloc(sizeof(char) * MAX_CHARACTER_LENGTH);
         promptarray[0] = 's';
         promptarray[1] = 'h';
@@ -73,11 +75,11 @@ int change_dir(char **dir){
 }
 
 char **cmd_parse(char const *line){
+    
     //Variables
-    char * copyOfLine;
-    char ** args = (char **)malloc(sizeof(char*) * _SC_ARG_MAX);
-    char * token;
-    int argCounter = 0;
+    argCounter = 0;
+    char * copyOfLine = "";
+    char ** args = (char **)malloc(sizeof(char*) * MAX_SIZE);  //leak here, never freed
 
     //Check that there is enough space to allocate the memory.
     if(args == NULL){
@@ -86,56 +88,41 @@ char **cmd_parse(char const *line){
     }
 
     //Copy of Line
-    copyOfLine = strdup(line);
+    copyOfLine = strdup(line);             //leak here, never freed
+    // printf("copyOfLine: %s\n", copyOfLine);      //Print line remove later
 
     //Parse copyofLine for 1st command
-    token = strtok(copyOfLine, " ");
-    args[argCounter] = strdup(token);
-    
-    //Parse Arguments
-    token = strtok(NULL, " ");
+    args[argCounter] = strtok(copyOfLine, " ");
+    // printf("args[0]: %s\n", args[argCounter]);   //Print line remove later
 
-    while(token != NULL && argCounter < _SC_ARG_MAX - 1){
-        args[argCounter] = strdup(token);
+    // if(args == NULL){
+    //     cmd_free(args);
+    //     free(copyOfLine);
+    //     exit(0);
+    // }
+
+    while(args[argCounter] != NULL && argCounter < MAX_SIZE - 1){
         argCounter++;
-        token = strtok(NULL, " ");
+        args[argCounter] = strtok(NULL, " ");
+        // printf("args[%d]: %s\n", argCounter, args[argCounter]);   //Print line remove later
     }
 
-    args[argCounter] = NULL;
+    argCounter = 0;
+
+    // args[argCounter] = NULL;
+    // free(copyOfLine);
     
     return args;
 
-
-
-    // /*Return pointer for the return value and string */
-    // char ** returnPointer;
-    // char * stringLine = "";
-
-    // /* Allocation and Instantiation of new array of arguments or argv */
-    // char * stringarray = (char *)malloc(sizeof(char) * _SC_ARG_MAX);
-
-    // /* Copy the incoming line to another stringLine that is muttable */
-    // stringLine = strdup(line);
-    // printf("stringline: %s\n", stringLine);
-
-    // /* Tokenizing the arguments to put into the array */
-    // char * partofstring = strtok(stringLine, " ");
-    // printf("partofstring %s\n", partofstring);
-
-    // /* Copy each piece of the tokenized array into our newly allocated array */
-    // int posCounter = 0;  //also argc
-    // while(partofstring[posCounter] != '\0' || posCounter < _SC_ARG_MAX){
-    //     stringarray[posCounter] = partofstring[posCounter];
-    //     posCounter++;
-    //     strtok(NULL, " ");
-    //     // printf("Token %s\n", partofstring);
-    // }
-    // returnPointer = &stringarray;
-    // return returnPointer;
 }
 
 void cmd_free(char ** line){
-    free(*line);
+
+    // for(int i = 0; i < argCounter; i++){
+    //     free(line[i]);
+    // }
+    // free(line);
+    free(*(&line));
     line = NULL;
 }
 
@@ -158,7 +145,7 @@ bool do_builtin(struct shell *sh, char **argv){
                 free(argv[i]);
             }
         }
-        free(argv);
+        cmd_free(argv);
         free(sh);
         exit(0);
     }

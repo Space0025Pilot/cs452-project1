@@ -86,36 +86,10 @@ int main(int argc, char **argv)
   }
   /* Free the command line */
   cmd_free(linepointer);
+  cmd_free(linereturnpointer);
+  free(line);
 
   /* Free the allocated memory for the shell */
   sh_destroy(&sh);
   return 0;
 }
-    
-
-
-
-
-  //Extra code that may help later:
-  //Read the entire line and delimit by whitespace
-    // if((strncmp(line, "cd", 2) == 0)){
-    //   printf("success\n");
-    //   //nothing entered -- users home directory
-    //   if(strcmp(line, "cd") == 0){
-    //     home = getenv("HOME");
-    //     printf("Getenv HOME: %s\n", home);
-    //     homepointer = &home;
-    //     if(home != NULL){
-    //       err = change_dir(homepointer);
-    //       printf("err: %d\n", err);
-    //       printf("Getenv HOME Second Call: %s\n", getenv("HOME"));
-    //       if(err == -1){
-    //         // free(err);
-    //         // free(homepointer);
-    //         // free(home);
-    //         exit(1);
-    //       }
-    //     }
-    //     // free(err);
-    //     // free(homepointer);
-    //     // free(home);

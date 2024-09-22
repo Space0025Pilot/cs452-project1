@@ -18,42 +18,50 @@
 // }
 
 
-// void test_cmd_parse2(void)
-// {
-//      //The string we want to parse from the user.
-//      //foo -v
-//      char *stng = (char*)malloc(sizeof(char)*7);
-//      strcpy(stng, "foo -v");
-//      char **actual = cmd_parse(stng);
-//      //construct our expected output
-//      size_t n = sizeof(char*) * 6;
-//      char **expected = (char**) malloc(sizeof(char*) *6);
-//      memset(expected,0,n);
-//      expected[0] = (char*)malloc(sizeof(char)*4);
-//      expected[1] = (char*)malloc(sizeof(char)*3);
-//      expected[2] = (char*)NULL;
+void test_cmd_parse2(void)
+{
+     //The string we want to parse from the user.
+     //foo -v
+     char *stng = (char*)malloc(sizeof(char)*7); // leak here, not freed correctly
+     strcpy(stng, "foo -v");
+    //  printf("stng: %s\n", stng);            //Print line remove later
+     char **actual = cmd_parse(stng);
+    //  printf("actual[0]: %s\n", actual[0]);  //Print line remove later
+    //  printf("actual[1]: %s\n", actual[1]);  //Print line remove later
+     //construct our expected output
+     size_t n = sizeof(char*) * 6;
+     char **expected = (char**) malloc(sizeof(char*) *6);  //leak here, not freed correctly
+     memset(expected,0,n);
+     expected[0] = (char*)malloc(sizeof(char)*4);  //leak here, not freed correctly
+     expected[1] = (char*)malloc(sizeof(char)*3);  //leak here, not freed correctly
+     expected[2] = (char*)NULL;
 
-//      strcpy(expected[0], "foo");
-//      strcpy(expected[1], "-v");
-//      TEST_ASSERT_EQUAL_STRING(expected[0],actual[0]);
-//      TEST_ASSERT_EQUAL_STRING(expected[1],actual[1]);
-//      TEST_ASSERT_FALSE(actual[2]);
-//      free(expected[0]);
-//      free(expected[1]);
-//      free(expected);
-// }
+     strcpy(expected[0], "foo");
+     strcpy(expected[1], "-v");
+    //  printf("expected[0]: %s\n", expected[0]);  //Print line remove later
+    //  printf("expected[1]: %s\n", expected[1]);  //Print Line remove later
+     TEST_ASSERT_EQUAL_STRING(expected[0],actual[0]);
+     TEST_ASSERT_EQUAL_STRING(expected[1],actual[1]);
+     TEST_ASSERT_FALSE(actual[2]);
+     free(stng);
+     free(expected[0]);
+     free(expected[1]);
+     free(expected[2]);
+     cmd_free(expected);
+     cmd_free(actual);
+}
 
-// void test_cmd_parse(void)
-// {
-//      char **rval = cmd_parse("ls -a -l");
-//      TEST_ASSERT_TRUE(rval);
-//      TEST_ASSERT_EQUAL_STRING("ls", rval[0]);
-//      TEST_ASSERT_EQUAL_STRING("-a", rval[1]);
-//      TEST_ASSERT_EQUAL_STRING("-l", rval[2]);
-//      TEST_ASSERT_EQUAL_STRING(NULL, rval[3]);
-//      TEST_ASSERT_FALSE(rval[3]);
-//      cmd_free(rval);
-// }
+void test_cmd_parse(void)
+{
+     char **rval = cmd_parse("ls -a -l");
+     TEST_ASSERT_TRUE(rval);
+     TEST_ASSERT_EQUAL_STRING("ls", rval[0]);
+     TEST_ASSERT_EQUAL_STRING("-a", rval[1]);
+     TEST_ASSERT_EQUAL_STRING("-l", rval[2]);
+     TEST_ASSERT_EQUAL_STRING(NULL, rval[3]);
+     TEST_ASSERT_FALSE(rval[3]);
+     cmd_free(rval);
+}
 
 // void test_trim_white_no_whitespace(void)
 // {
@@ -203,6 +211,7 @@ int main(void) {
   // RUN_TEST(test_stuff);
   RUN_TEST(test_get_prompt_default);
   RUN_TEST(test_get_prompt_custom);
-  // RUN_TEST(test_cmd_parse);
+  RUN_TEST(test_cmd_parse);
+  RUN_TEST(test_cmd_parse2);
   return UNITY_END();
 }
