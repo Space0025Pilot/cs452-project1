@@ -56,11 +56,12 @@ int change_dir(char **dir){
     if(*dir == NULL && getenv("HOME") != NULL){
         printf("Inside only cd command, home directory %s\n", getenv("HOME"));
         retvalue = chdir(getenv("HOME"));
+        printf("retvalue %d\n", retvalue);
         return retvalue;
     }
 
     /* If directory is null, get home directory and change to it */
-    if(*dir == NULL && getenv("HOME") == NULL){
+    if(*dir != NULL && getenv("HOME") == NULL){
         userid = getuid();
         pw = getpwuid(userid);
         if(pw == NULL){
@@ -162,24 +163,29 @@ bool do_builtin(struct shell *sh, char **argv){
     bool returnvalue = false;
 
     char const * arg0 = argv[0];
+    printf("arg0: %s\n", arg0);
     // char const * arg1 = argv[1];
     char ** argv1pointer = &argv[1];
+    
 
     /* Exit and Crtl-D Scenarios */ 
     if((strcmp(arg0, "exit") == 0) || (arg0 == NULL)){
+        printf("inside exit\n");
         returnvalue = true;
         if(argv != NULL){
+            printf("free arguments\n");
             for(int i = 0; argv[i] != NULL; i++){
                 free(argv[i]);
             }
         }
         cmd_free(argv);
-        free(sh);
+        sh_destroy(sh);
         exit(0);
     }
 
     /* Change directory */
     if(strcmp(arg0, "cd") == 0 && argv[1] == NULL){
+        printf("inside cd\n");
         change_dir(argv1pointer);
         returnvalue = true;
     }
@@ -201,6 +207,7 @@ void sh_init(struct shell *sh){
 
 void sh_destroy(struct shell *sh){
     /* Destroy the shell struct */
+    free(sh->prompt);
     free(sh);
 }
 
