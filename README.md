@@ -1,3 +1,6 @@
+# Project 1 Summary
+
+
 # Makefile Project Template
 
 Steps to configure, build, run, and test the project. HIIIIIII!

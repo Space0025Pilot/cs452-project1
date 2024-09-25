@@ -50,18 +50,25 @@ char *get_prompt(const char *env){
 }
 
 int change_dir(char **dir){
+    // printf("Directory coming in: %s\n", *(*&dir));
+    // char const * arg1 = dir[1];
+    // printf("Second Argument: %s\n", arg1);
 
     int retvalue;
+    // char cwd[1024];
+
     //IF directory is null and Home is not null, change to the home directory
-    if(*(dir) == NULL && getenv("HOME") != NULL){
-        printf("Inside only cd command, home directory %s\n", getenv("HOME"));
+    if(dir[1] == NULL && getenv("HOME") != NULL){
+        // printf("Inside only cd command, home directory %s\n", getenv("HOME")); //Take these out later
         retvalue = chdir(getenv("HOME"));
-        printf("retvalue %d\n", retvalue);
+        // printf("retvalue %d\n", retvalue);                                     //Take these out later
+        // getcwd(cwd, sizeof(cwd));                                              //Take these out later
+        // printf("Current working dir cd only: %s\n", cwd);                      //Take these out later
         return retvalue;
     }
 
     /* If directory is null, and get home directory is null, then find the home directory of the user and change to it */
-    if(*dir == NULL && getenv("HOME") == NULL){
+    if(dir[1] == NULL && getenv("HOME") == NULL){
         userid = getuid();
         pw = getpwuid(userid);
         if(pw == NULL){
@@ -69,6 +76,8 @@ int change_dir(char **dir){
             return -1;
         }
         retvalue = chdir(pw->pw_dir);
+        // getcwd(cwd, sizeof(cwd));                                          //Take these out later
+        // printf("Current working dir: %s\n", cwd);                          //Take these out later
         if(retvalue == 0){
             return retvalue;
         }
@@ -78,10 +87,12 @@ int change_dir(char **dir){
     }
 
     /* If directory is not null, then changes to specified directory */
-    if(*dir != NULL){
-        printf("Directory not null\n");
-        retvalue = chdir(*(dir));
-        printf("retvalue: %d\n", retvalue);
+    if(dir[1] != NULL && getenv("HOME") != NULL){
+        // printf("Directory not null\n");                                  //Take these out later
+        retvalue = chdir(dir[1]);
+        // getcwd(cwd, sizeof(cwd));
+        // printf("Current working dir - directory not null: %s\n", cwd);   //Take these out later
+        // printf("retvalue: %d\n", retvalue);                              //Take these out later
     }
     return retvalue;
 }
@@ -154,18 +165,19 @@ bool do_builtin(struct shell *sh, char **argv){
     bool returnvalue = false;
 
     char const * arg0 = argv[0];
-    printf("arg0: %s\n", arg0);
-    char const * arg1 = argv[1];
-    printf("arg1: %s\n", arg1);
-    char ** argv1pointer = &argv[1];
+    // printf("arg0: %s\n", arg0);                        //Take these out later
+    // char const * arg1 = argv[1];                       //Take these out later
+    // printf("arg1: %s\n", arg1);                        //Take these out later
+    // char ** argv1pointer = &argv[1];                   //Take these out later
+    char cwd[1024];
     
 
     /* Exit and Crtl-D Scenarios */ 
     if((strcmp(arg0, "exit") == 0) || (arg0 == NULL)){
-        printf("inside exit\n");
+        // printf("inside exit\n");                      //Take these out later
         returnvalue = true;
         if(argv != NULL){
-            printf("free arguments\n");
+            // printf("free arguments\n");                  //Take these out later
             for(int i = 0; argv[i] != NULL; i++){
                 free(argv[i]);
             }
@@ -176,14 +188,15 @@ bool do_builtin(struct shell *sh, char **argv){
     }
 
     /* Change directory */
-    if(strcmp(arg0, "cd") == 0 && argv[1] == NULL){
-        printf("inside cd\n");
-        change_dir(argv1pointer);
+    if(strcmp(arg0, "cd") == 0){
+        change_dir(argv);
         returnvalue = true;
     }
-    if(strcmp(arg0, "cd") == 0 && argv[1] != NULL){
-        printf("inside cd plus directory\n");
-        change_dir(argv1pointer);
+    /* Print working directory */
+    if(strcmp(arg0, "pwd") == 0){
+        getcwd(cwd, sizeof(cwd));
+        printf("%s\n", cwd);
+        // printf("Path of current Working directory: %s\n", getenv("PATH"));
         returnvalue = true;
     }
     return returnvalue;
