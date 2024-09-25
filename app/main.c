@@ -22,7 +22,7 @@ int main(int argc, char **argv)
   char **linepointer;
   char **linereturnpointer;
   // int err;
-  struct shell sh;
+  struct shell *sh = (struct shell *)malloc(sizeof(struct shell));
   bool handledOrNot;
   char * prompt = "";
 
@@ -51,14 +51,14 @@ int main(int argc, char **argv)
   }
   
   /* Initialize the shell */
-  sh_init(&sh);
+  sh_init(*(&sh));
 
   /* Get prompt from the environment variable*/
   prompt = get_prompt("MY_PROMPT");
   // strcpy(sh->prompt, prompt);
-  sh.prompt = prompt;
+  sh->prompt = prompt;
   printf("Get prompt variable: %s\n", prompt);
-  printf("Get shell prompt variable: %s\n", sh.prompt);
+  printf("Get shell prompt variable: %s\n", sh->prompt);
 
   /* Start of readline and use of history */
   using_history();
@@ -74,12 +74,12 @@ int main(int argc, char **argv)
     linepointer = *(&linereturnpointer);
 
     /* Handle the arguments */
-    handledOrNot = do_builtin(&sh, linepointer);
+    handledOrNot = do_builtin(*(&sh), linepointer);
     if(handledOrNot == false){
       //error
       cmd_free(linepointer);
       free(line);
-      sh_destroy(&sh);
+      sh_destroy(*(&sh));
       exit(-1);
     }
 
@@ -90,6 +90,6 @@ int main(int argc, char **argv)
   free(line);
 
   /* Free the allocated memory for the shell */
-  sh_destroy(&sh);
+  sh_destroy(*(&sh));
   return 0;
 }
