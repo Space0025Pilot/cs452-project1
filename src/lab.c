@@ -13,6 +13,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <pwd.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #include "lab.h"
 #include "../tests/harness/unity.h"
 
@@ -24,6 +26,7 @@ struct passwd *pw; //pointer to the struct
 char * home;
 char **homepointer;
 int argCounter = 0;
+HIST_ENTRY ** list_cmds;
 
 char *get_prompt(const char *env){
     if(getenv(env) != NULL){
@@ -152,7 +155,7 @@ char *trim_white(char *line){
     line[j] = '\0';
 
     // Remove trailing spaces
-    for (i = strlen(line) - 1; i >= 0 && isspace(line[i]); i--) {   //heap buffer overflow - handle only spaces case
+    for (i = strlen(line) - 1; i > 0 && isspace(line[i]); i--) {   //heap buffer overflow - handle only spaces case
         line[i] = '\0';
     }
 
@@ -165,6 +168,9 @@ bool do_builtin(struct shell *sh, char **argv){
     bool returnvalue = false;
 
     char const * arg0 = argv[0];
+    HIST_ENTRY * entries;
+    // HIST_ENTRY ** history_list = history_list();
+    // int n = sizeof(historyList)/sizeof(historyList[0]);
     // printf("arg0: %s\n", arg0);                        //Take these out later
     // char const * arg1 = argv[1];                       //Take these out later
     // printf("arg1: %s\n", arg1);                        //Take these out later
@@ -198,6 +204,15 @@ bool do_builtin(struct shell *sh, char **argv){
         printf("%s\n", cwd);
         // printf("Path of current Working directory: %s\n", getenv("PATH"));
         returnvalue = true;
+    }
+    //HISTORY COMMAND HERE
+    list_cmds = history_list();
+    if(strcmp(arg0, "history") == 0){
+        
+        for(int i = history_base; i < history_length; i++){
+            entries = history_get(i);
+            printf("%s\n", entries->line);
+        }
     }
     return returnvalue;
 }
