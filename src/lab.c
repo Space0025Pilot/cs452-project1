@@ -26,7 +26,6 @@ struct passwd *pw; //pointer to the struct
 char * home;
 char **homepointer;
 int argCounter = 0;
-HIST_ENTRY ** list_cmds;
 
 char *get_prompt(const char *env){
     if(getenv(env) != NULL){
@@ -169,8 +168,6 @@ bool do_builtin(struct shell *sh, char **argv){
 
     char const * arg0 = argv[0];
     HIST_ENTRY * entries;
-    // HIST_ENTRY ** history_list = history_list();
-    // int n = sizeof(historyList)/sizeof(historyList[0]);
     // printf("arg0: %s\n", arg0);                        //Take these out later
     // char const * arg1 = argv[1];                       //Take these out later
     // printf("arg1: %s\n", arg1);                        //Take these out later
@@ -205,7 +202,6 @@ bool do_builtin(struct shell *sh, char **argv){
         // printf("Path of current Working directory: %s\n", getenv("PATH"));
         returnvalue = true;
     }
-    //HISTORY COMMAND HERE
     list_cmds = history_list();
     if(strcmp(arg0, "history") == 0){
         
