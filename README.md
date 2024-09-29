@@ -19,14 +19,14 @@ I also within taking care of this also wrote the trim linen functionality which 
 
 Afterwards, I implemented the pwd command which at first I thought had it printing out the path environment variable but then realized after consulting my windows terminal that pwd prints out only the working directory path. So I then found getcwd which I was able to utilize to implement this function with this command. 
 
-Now I am working on finishing this task with the history command. You can also see the previous commands by pressing the up arrow when running the shell itself as it tells you all the commands you have used since the initial command to start it up.
+I have completed the history command in which I utilized the history library in order to figure out how to print out the specific commands on each line. At first I tried to use the data element, but found a block here with the histdata_t type which doesn't refer to a specific type to print. So then I decided to mess with the char * line initialized in the struct itself and this worked as a charm so that it prints out all the commands entered in the history. You can also see the previous commands by pressing the up arrow when running the shell itself as it tells you all the commands you have used since the initial command to start it up.
 
 Task 7 Create a Process:
 
 
 # Makefile Project Template
 
-Steps to configure, build, run, and test the project. HIIIIIII!
+Steps to configure, build, run, and test the project.
 
 ## Building
 
