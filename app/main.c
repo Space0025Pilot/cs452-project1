@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "../src/lab.h"
@@ -25,6 +27,10 @@ int main(int argc, char **argv)
   struct shell *sh = (struct shell *)malloc(sizeof(struct shell));
   bool handledOrNot;
   char * prompt = "";
+  pid_t parentProcessID;
+  pid_t childProcessID;
+  int status;
+  int executed = 0;
 
   /* Catch the aspect of printing the version */
   /* Use getopt() to process command line arguments */
@@ -69,6 +75,11 @@ int main(int argc, char **argv)
     /* Trim whitespace from line*/
     line = trim_white(line);
 
+    // /* Detecting no commands */
+    // if(!isspace(line[0]) || line[0] =='\0'){
+
+    // }
+
     /* Parse the command line */
     linereturnpointer = cmd_parse(line); //may have pointer issues here just BEWARE!
     linepointer = *(&linereturnpointer);
@@ -76,11 +87,38 @@ int main(int argc, char **argv)
     /* Handle the arguments */
     handledOrNot = do_builtin(*(&sh), linepointer);
     if(handledOrNot == false){
+
+      childProcessID = fork();
+      parentProcessID = getppid();
+
+      if(childProcessID < 0){
+        cmd_free(linepointer);
+        free(line);
+        sh_destroy(*(&sh));
+        perror("fork failed");
+        exit(-1);
+      }
+      else if(childProcessID == 0){
+        printf("This is the child process, PID: %d\n", getpid());
+        executed = execvp(linepointer[0], linepointer);
+        if(executed == -1){
+          cmd_free(linepointer);
+          free(line);
+          sh_destroy(*(&sh));
+          perror("not executing");
+          exit(-1);
+        }
+      } 
+      else {
+        printf("This is the parent process, PID: %d\n", getpid());
+        waitpid(-1, &status, 0);
+      }
+      
       //error
-      cmd_free(linepointer);
-      free(line);
-      sh_destroy(*(&sh));
-      exit(-1);
+      // cmd_free(linepointer);
+      // free(line);
+      // sh_destroy(*(&sh));
+      // exit(-1);
     }
 
   }

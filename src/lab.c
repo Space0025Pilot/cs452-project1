@@ -13,10 +13,12 @@
 #include <string.h>
 #include <ctype.h>
 #include <pwd.h>
+#include <signal.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "lab.h"
 #include "../tests/harness/unity.h"
+
 
 #define MAX_CHARACTER_LENGTH 10
 #define MAX_SIZE 4096
@@ -155,8 +157,15 @@ char *trim_white(char *line){
     line[j] = '\0';
 
     // Remove trailing spaces
-    for (i = strlen(line) - 1; i > 0 && isspace(line[i]); i--) {  //heap buffer overflow - handle only spaces case
-        line[i] = '\0';
+    int p = strlen(line) - 1;
+    while(p > 0){
+        if(isspace(line[p])){
+            line[p] = '\0';
+        }
+        else{
+            break;
+        }
+        p--;
     }
 
    return line;
@@ -218,12 +227,39 @@ bool do_builtin(struct shell *sh, char **argv){
 
 void sh_init(struct shell *sh){
 
-    /* Initialize the sh with the initial values */
-    sh->shell_is_interactive = 1;
-    sh->shell_pgid = 0;  //grab from the OS
-    sh->shell_tmodes.c_iflag = 1; //Maybe set all flags to off
-    sh->shell_terminal = 1;
-    sh->prompt = NULL;
+
+  /* See if we are running interactively.  */
+  sh->shell_terminal = STDIN_FILENO;
+  sh->shell_is_interactive = isatty (sh->shell_terminal);
+
+  if (sh->shell_is_interactive)
+    {
+      /* Loop until we are in the foreground.  */
+      while (tcgetpgrp (sh->shell_terminal) != (sh->shell_pgid = getpgrp ()))
+        kill (- sh->shell_pgid, SIGTTIN);
+
+      /* Ignore interactive and job-control signals.  */
+      signal (SIGINT, SIG_IGN);
+      signal (SIGQUIT, SIG_IGN);
+      signal (SIGTSTP, SIG_IGN);
+      signal (SIGTTIN, SIG_IGN);
+      signal (SIGTTOU, SIG_IGN);
+      signal (SIGCHLD, SIG_IGN);
+
+      /* Put ourselves in our own process group.  */
+      sh->shell_pgid = getpid ();
+      if (setpgid (sh->shell_pgid, sh->shell_pgid) < 0)
+        {
+          perror ("Couldn't put the shell in its own process group");
+          exit (1);
+        }
+
+      /* Grab control of the terminal.  */
+      tcsetpgrp (sh->shell_terminal, sh->shell_pgid);
+
+      /* Save default terminal attributes for shell.  */
+      tcgetattr (sh->shell_terminal, &sh->shell_tmodes);
+    }
 }
 
 void sh_destroy(struct shell *sh){

@@ -215,12 +215,11 @@ int main(void) {
   RUN_TEST(test_cmd_parse2);
   RUN_TEST(test_trim_white_no_whitespace);
   RUN_TEST(test_trim_white_start_whitespace);
-  RUN_TEST(test_trim_white_start_whitespace);
   RUN_TEST(test_trim_white_end_whitespace);
   RUN_TEST(test_trim_white_both_whitespace_single);
   RUN_TEST(test_trim_white_both_whitespace_double);
   RUN_TEST(test_trim_white_mostly_whitespace);
-//   RUN_TEST(test_trim_white_all_whitespace); 
+  RUN_TEST(test_trim_white_all_whitespace); 
   RUN_TEST(test_ch_dir_home);
   RUN_TEST(test_ch_dir_root);
   
