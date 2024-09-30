@@ -155,7 +155,7 @@ char *trim_white(char *line){
     line[j] = '\0';
 
     // Remove trailing spaces
-    for (i = strlen(line) - 1; i > 0 && isspace(line[i]); i--) {   //heap buffer overflow - handle only spaces case
+    for (i = strlen(line) - 1; i > 0 && isspace(line[i]); i--) {  //heap buffer overflow - handle only spaces case
         line[i] = '\0';
     }
 
