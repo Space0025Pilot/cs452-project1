@@ -12,6 +12,7 @@
 #include <getopt.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <signal.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "../src/lab.h"
@@ -100,6 +101,13 @@ int main(int argc, char **argv)
       }
       else if(childProcessID == 0){
         printf("This is the child process, PID: %d\n", getpid());
+        setpgid(childProcessID, childProcessID);
+        tcsetpgrp(sh->shell_terminal, childProcessID);
+        signal (SIGINT, SIG_DFL);
+        signal (SIGQUIT, SIG_DFL);
+        signal (SIGTSTP, SIG_DFL);
+        signal (SIGTTIN, SIG_DFL);
+        signal (SIGTTOU, SIG_DFL);
         executed = execvp(linepointer[0], linepointer);
         if(executed == -1){
           cmd_free(linepointer);
