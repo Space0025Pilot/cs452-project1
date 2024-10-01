@@ -32,6 +32,9 @@ int main(int argc, char **argv)
   pid_t childProcessID;
   int status;
   int executed = 0;
+  // bool ampFlag = false;
+  // int idCounter = 1;
+  // char * ampYesOrN0;
 
   /* Catch the aspect of printing the version */
   /* Use getopt() to process command line arguments */
@@ -128,8 +131,82 @@ int main(int argc, char **argv)
       // sh_destroy(*(&sh));
       // exit(-1);
     }
+    
+    //WE ARE WORKING ON THIS PART
+    // //walk through the array to find how many arguments
+    // int i = 0;
+    // while(linepointer[i] != NULL){
+    //   i++;
+    // }
+    // i--;
+    // //check the last argument for ampersand
+    // ampYesOrN0 = strchr(linepointer[i], '&');
+    // //flip flag depending on the output
+    // if(ampYesOrN0 != NULL){
+    //   ampFlag = true;
+    // } else {
+    //   ampFlag = false;
+    // }
+
+    // // if(ampFlag == true){
+    // //   idCounter++;
+    // // }
+
+    //   childProcessID = fork();
+    //   parentProcessID = getppid();
+
+    //   if(ampFlag == true){
+    //     printf("[%d] %d %s\n", idCounter, childProcessID, *linepointer);
+    //   }
+
+    //   if(childProcessID < 0){
+    //     cmd_free(linepointer);
+    //     free(line);
+    //     sh_destroy(*(&sh));
+    //     perror("fork failed");
+    //     exit(-1);
+    //   }
+    //   else if(childProcessID == 0){
+    //     // printf("This is the child process, PID: %d\n", getpid());
+    //     setpgid(childProcessID, childProcessID);
+    //     tcsetpgrp(sh->shell_terminal, childProcessID);
+    //     signal (SIGINT, SIG_DFL);
+    //     signal (SIGQUIT, SIG_DFL);
+    //     signal (SIGTSTP, SIG_DFL);
+    //     signal (SIGTTIN, SIG_DFL);
+    //     signal (SIGTTOU, SIG_DFL);
+
+    //     handledOrNot = do_builtin(*(&sh), linepointer);
+
+    //     if(handledOrNot == false){
+    //       executed = execvp(linepointer[0], linepointer);
+    //       idCounter++;
+    //     }
+    //     if(executed == -1){
+    //       cmd_free(linepointer);
+    //       free(line);
+    //       sh_destroy(*(&sh));
+    //       perror("not executing");
+    //       exit(-1);
+    //     }
+    //   } 
+    //   else {
+    //     // printf("This is the parent process, PID: %d\n", getpid());
+    //     if(ampFlag == false){
+    //       waitpid(-1, &status, WNOHANG);
+    //     }
+        
+    //   }
+      
+    //   //error
+    //   // cmd_free(linepointer);
+    //   // free(line);
+    //   // sh_destroy(*(&sh));
+    //   // exit(-1);
 
   }
+
+
   /* Free the command line */
   cmd_free(linepointer);
   cmd_free(linereturnpointer);
