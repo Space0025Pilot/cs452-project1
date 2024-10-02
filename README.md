@@ -52,7 +52,7 @@ Summary of Project 1 (30pts)
 
 The deadline on this was a challenge and I wish I had more time to completely work through this to finish the programming assignment, however am proud of the work and time that I dedicated to this learning exericse. I would after everything is graded to see a full working shell as an example of the professors working code to have for reference and future.
 
-Overall, I felt I learned a heck of a lot when it comes to the hours I spent with this. It isn't 100% completed as I had hoped I could get to even with starting the project the day it was assigned, but made great strides in learning which is what really counts. This was a difficult project and for the future a bit more help on the front end and more in depth discussions of forks and processes will go a long way in helping do the later parts of this project.
+Overall, I felt I learned a heck of a lot when it comes to the hours I spent with this. It isn't 100% completed as I had hoped I could get to even with starting the project the day it was assigned, but made great strides in learning which is what really counts. This was a difficult project and for the future a bit more help on the front end and more in depth discussions of forks and processes will go a long way in helping do the later parts of this project. I also can say that my code does have memory leaks however, it functions properly so I went with this for the sake of trying to complete the project and only worrying about them at the end. I would advise for the running the make and the other commands, ignore the memory leaks as they don't effect functionality.
 
 ## Run the Code
 Run the general make clean - this will get all the files set up
