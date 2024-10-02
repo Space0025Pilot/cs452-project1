@@ -29,12 +29,12 @@ int main(int argc, char **argv)
   bool handledOrNot;
   char * prompt = "";
   pid_t parentProcessID;
-  pid_t childProcessID;
+  pid_t processID;
   int status;
   int executed = 0;
-  // bool ampFlag = false;
-  // int idCounter = 1;
-  // char * ampYesOrN0;
+  bool ampFlag = false;
+  int idCounter = 1;
+  char * ampYesOrN0;
 
   /* Catch the aspect of printing the version */
   /* Use getopt() to process command line arguments */
@@ -92,26 +92,28 @@ int main(int argc, char **argv)
     handledOrNot = do_builtin(*(&sh), linepointer);
     if(handledOrNot == false){
 
-      childProcessID = fork();
+      processID = fork();
       parentProcessID = getppid();
 
-      if(childProcessID < 0){
+      if(processID < 0){
         cmd_free(linepointer);
         free(line);
         sh_destroy(*(&sh));
         perror("fork failed");
         exit(-1);
       }
-      else if(childProcessID == 0){
+      else if(processID == 0){
         printf("This is the child process, PID: %d\n", getpid());
-        setpgid(childProcessID, childProcessID);
-        tcsetpgrp(sh->shell_terminal, childProcessID);
+        pid_t child = getpid();
+        setpgid(child, child);
+        tcsetpgrp(sh->shell_terminal, child);
         signal (SIGINT, SIG_DFL);
         signal (SIGQUIT, SIG_DFL);
         signal (SIGTSTP, SIG_DFL);
         signal (SIGTTIN, SIG_DFL);
         signal (SIGTTOU, SIG_DFL);
         executed = execvp(linepointer[0], linepointer);
+        // _Exit(status);   //Added may need to adjust this
         if(executed == -1){
           cmd_free(linepointer);
           free(line);
@@ -131,45 +133,57 @@ int main(int argc, char **argv)
       // sh_destroy(*(&sh));
       // exit(-1);
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     //WE ARE WORKING ON THIS PART
-    // //walk through the array to find how many arguments
+    //walk through the array to find how many arguments
     // int i = 0;
     // while(linepointer[i] != NULL){
     //   i++;
     // }
     // i--;
+
     // //check the last argument for ampersand
     // ampYesOrN0 = strchr(linepointer[i], '&');
-    // //flip flag depending on the output
+    // //flip flag depending on the output and remove the &
     // if(ampYesOrN0 != NULL){
+    //   for(int p = 0; p < strlen(ampYesOrN0) - 1; p++){
+    //     if(ampYesOrN0[p] == '&'){
+    //       ampYesOrN0[p] = '\0';
+    //       break;
+    //     }
+    //   }
     //   ampFlag = true;
     // } else {
     //   ampFlag = false;
     // }
 
-    // // if(ampFlag == true){
-    // //   idCounter++;
-    // // }
-
-    //   childProcessID = fork();
+    //   processID = fork();
+    //   if(processID == -1){
+    //     printf("Error creating process");
+    //   }
     //   parentProcessID = getppid();
 
     //   if(ampFlag == true){
-    //     printf("[%d] %d %s\n", idCounter, childProcessID, *linepointer);
+    //     printf("[%d] %d %s\n", idCounter, getpid(), *linepointer);
+    //     idCounter++;
     //   }
 
-    //   if(childProcessID < 0){
+    //   if(processID < 0){
+    //     printf("Shouldn't be in here\n");
     //     cmd_free(linepointer);
     //     free(line);
     //     sh_destroy(*(&sh));
     //     perror("fork failed");
     //     exit(-1);
     //   }
-    //   else if(childProcessID == 0){
+    //   else if(processID == 0){
+    //     printf("Inside child process\n");
     //     // printf("This is the child process, PID: %d\n", getpid());
-    //     setpgid(childProcessID, childProcessID);
-    //     tcsetpgrp(sh->shell_terminal, childProcessID);
+    //     pid_t child = getpid();
+    //     setpgid(child, child);
+    //     tcsetpgrp(sh->shell_terminal, child);
     //     signal (SIGINT, SIG_DFL);
     //     signal (SIGQUIT, SIG_DFL);
     //     signal (SIGTSTP, SIG_DFL);
@@ -177,32 +191,43 @@ int main(int argc, char **argv)
     //     signal (SIGTTOU, SIG_DFL);
 
     //     handledOrNot = do_builtin(*(&sh), linepointer);
+    //     printf("Handled in do built in: %d\n", handledOrNot);
 
     //     if(handledOrNot == false){
+    //       printf("Handled dobuilt in is false\n");
     //       executed = execvp(linepointer[0], linepointer);
-    //       idCounter++;
+    //       // idCounter++;
     //     }
     //     if(executed == -1){
+    //       printf("executed is -1 bad\n");
     //       cmd_free(linepointer);
     //       free(line);
     //       sh_destroy(*(&sh));
     //       perror("not executing");
     //       exit(-1);
     //     }
+    //     return 0;
     //   } 
     //   else {
+    //     printf("parent process\n");
     //     // printf("This is the parent process, PID: %d\n", getpid());
     //     if(ampFlag == false){
-    //       waitpid(-1, &status, WNOHANG);
+    //       waitpid(processID, &status, 0); //Set the status of child process - if it finished.
+    //       tcsetpgrp(sh->shell_terminal, getpgrp());
+    //     }
+    //     else {
+    //       waitpid(processID, &status, WNOHANG);
     //     }
         
     //   }
       
-    //   //error
-    //   // cmd_free(linepointer);
-    //   // free(line);
-    //   // sh_destroy(*(&sh));
-    //   // exit(-1);
+      //error
+      // cmd_free(linepointer);
+      // free(line);
+      // sh_destroy(*(&sh));
+      // exit(-1);
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
 
   }
 
